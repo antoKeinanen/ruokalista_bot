@@ -35,6 +35,8 @@ function extract_meals(menu) {
 
     for (let meal in meals) {
       const items = meals[meal]["menuItems"];
+      
+      if (meals[meal]["name"] == "Erityisruokavalio") continue;
 
       for (let item in items) {
         let name = items[item]["name"].split("  ")[0];
