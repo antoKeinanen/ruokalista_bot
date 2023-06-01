@@ -17,15 +17,12 @@ const webhook = new Discord.WebhookClient(
 
 const config = require("./config.json");
 
-async function build_message() { }
-
 async function get_menu() {
   let menu = await fetch("https://fi.jamix.cloud/apps/menuservice/rest/haku/menu/96346/2?lang=fi")
   menu = await menu.json()
 
   const clean_menu = extract_meals(menu);
   return clean_menu;
-
 }
 
 function extract_meals(menu) {
