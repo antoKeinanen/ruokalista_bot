@@ -68,6 +68,6 @@ get_menu().then((menu) => {
   
   webhook.send({
     content: message,
-  })
+  }).then(() => webhook.destroy())
 });
 
