@@ -11,15 +11,15 @@ if (!process.env.WEBHOOK_URL) {
 }
 
 // Create WebhookClient
-const webhook = new Discord.WebhookClient(
-  process.env.WEBHOOK_URL,
-);
+const webhook = new Discord.WebhookClient(process.env.WEBHOOK_URL);
 
 const config = require("./config.json");
 
 async function get_menu() {
-  let menu = await fetch("https://fi.jamix.cloud/apps/menuservice/rest/haku/menu/96346/2?lang=fi")
-  menu = await menu.json()
+  let menu = await fetch(
+    "https://fi.jamix.cloud/apps/menuservice/rest/haku/menu/96346/2?lang=fi"
+  );
+  menu = await menu.json();
 
   const clean_menu = extract_meals(menu);
   return clean_menu;
@@ -28,15 +28,18 @@ async function get_menu() {
 function extract_meals(menu) {
   let clean_meals = [];
   const days = menu[0]["menuTypes"][0]["menus"][0]["days"];
+  let counter = 0;
 
-  for (let day in days) {
-    const meals = days[day]["mealoptions"];
+  for (let day of days) {
+    if (counter == 5) return clean_meals;
+    counter++;
+    const meals = day["mealoptions"];
     let item_memo = [];
 
-    for (let meal in meals) {
-      const items = meals[meal]["menuItems"];
-      
-      if (meals[meal]["name"] == "Erityisruokavalio") continue;
+    for (let meal of meals) {
+      const items = meal["menuItems"];
+
+      if (meal["name"] == "Erityisruokavalio") continue;
 
       for (let item in items) {
         let name = items[item]["name"].split("  ")[0];
@@ -46,16 +49,25 @@ function extract_meals(menu) {
       }
     }
 
-    clean_meals[days[day]["weekday"] - 1] = item_memo;
+    clean_meals[day["weekday"] - 1] = item_memo;
   }
   return clean_meals;
 }
 
 function generate_message(menu) {
-  const weekdays = ["maanantai", "tiistai", "keskiviikko", "torstai", "perjantai", "lauantai", "sunnuntai"];
+  const weekdays = [
+    "maanantai",
+    "tiistai",
+    "keskiviikko",
+    "torstai",
+    "perjantai",
+    // "lauantai",
+    // "sunnuntai",
+  ];
   let message = "";
-  for (let day in menu) {
-    message += "# " + weekdays[day] + "\n"
+  for (let day in weekdays) {
+    if (!menu[day]) menu[day] = ["Ei ruokalistaa!"];
+    message += "# " + weekdays[day] + "\n";
     message += "- " + menu[day].join("\n- ") + "\n";
   }
 
@@ -64,9 +76,10 @@ function generate_message(menu) {
 
 get_menu().then((menu) => {
   const message = generate_message(menu);
-  
-  webhook.send({
-    content: message,
-  }).then(() => webhook.destroy())
-});
 
+  webhook
+    .send({
+      content: message,
+    })
+    .then(() => webhook.destroy());
+});
