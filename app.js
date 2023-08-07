@@ -42,7 +42,7 @@ function extract_meals(menu) {
       if (meal["name"] == "Erityisruokavalio") continue;
 
       for (let item in items) {
-        let name = items[item]["name"].split("  ")[0];
+        let name = items[item]["name"].replace(/([A-Z]+, )+[A-Za-z]+/, "");
         if (!item_memo.includes(name)) {
           item_memo.push(name);
         }
