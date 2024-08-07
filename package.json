@@ -1,6 +1,6 @@
 {
   "name": "koululaskuri",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Ilmoittaa koulupäivien määrän Discordiin",
   "main": "app.js",
   "scripts": {
